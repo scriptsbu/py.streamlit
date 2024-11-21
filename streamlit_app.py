@@ -41,7 +41,8 @@ def calculate_event_costs(num_customers, total_event_cost, cancellation_percenta
         'employee_cost': employee_cost,
         'cancellation_fee': cancellation_fee,
         'total_cost': total_cost,
-        'total_cancellation_charge': total_cancellation_charge
+        'total_cancellation_charge': total_cancellation_charge,
+        'average_hourly_rate': hourly_rate_used
     }
 
 # Streamlit app layout
@@ -63,5 +64,6 @@ if st.button("Calculate"):
         st.write(f"Total employee cost: ${result['employee_cost']:.2f}")
         st.write(f"Event Cancellation Fee: ${result['cancellation_fee']:.2f}")
         st.write(f"Total Cancellation Charge (employee + event): ${result['total_cancellation_charge']:.2f}")
+        st.write(f"Average Hourly Rate: ${result['average_hourly_rate']:.2f}")
     else:
         st.error(result)  # Display error message if any
