@@ -54,19 +54,24 @@ num_customers = st.number_input("Number of Customers", min_value=10, step=1)
 total_event_cost = st.number_input("Total Event Cost ($)", min_value=0.0, step=100.0)
 cancellation_percentage = st.number_input("Cancellation Percentage (%)", min_value=0.0, max_value=100.0, step=0.1)
 
-# Session state for adjusted employees
+# Session state for adjusted employees and hourly rate
 if 'adjusted_employees' not in st.session_state:
     st.session_state.adjusted_employees = None
+
+if 'adjusted_hourly_rate' not in st.session_state:
+    st.session_state.adjusted_hourly_rate = None
 
 # Calculate button
 if st.button("Calculate"):
     result = calculate_event_costs(num_customers, total_event_cost, cancellation_percentage)
 
-    # Store the auto-calculated number of employees in session state
+    # Store the auto-calculated number of employees and hourly rate in session state
     if isinstance(result, dict):
         st.session_state.adjusted_employees = result['num_employees']
+        st.session_state.adjusted_hourly_rate = result['average_hourly_rate']
     else:
         st.session_state.adjusted_employees = None
+        st.session_state.adjusted_hourly_rate = None
 
 # Allow user to adjust the number of employees
 if st.session_state.adjusted_employees is not None:
@@ -75,9 +80,14 @@ if st.session_state.adjusted_employees is not None:
                                           min_value=1, 
                                           step=1)
 
-    # Calculate costs based on adjusted number of employees
-    hourly_rate_used = (16 + 30) / 2  # Average hourly rate
-    adjusted_employee_cost = adjusted_employees * hourly_rate_used * 8  # Assuming 8 hours per event
+    # Allow user to adjust the average hourly rate
+    adjusted_hourly_rate = st.number_input("Adjust Average Hourly Rate ($)", 
+                                            value=st.session_state.adjusted_hourly_rate, 
+                                            min_value=0.0, 
+                                            step=0.1)
+
+    # Calculate costs based on adjusted number of employees and hourly rate
+    adjusted_employee_cost = adjusted_employees * adjusted_hourly_rate * 8  # Assuming 8 hours per event
     cancellation_fee = (total_event_cost * cancellation_percentage) / 100
     total_cost = total_event_cost + adjusted_employee_cost
     total_cancellation_charge = cancellation_fee + adjusted_employee_cost
@@ -85,7 +95,7 @@ if st.session_state.adjusted_employees is not None:
     # Display adjusted results
     st.subheader("Adjusted Calculation Results:")
     st.write(f"Adjusted number of employees: {adjusted_employees}")
+    st.write(f"Adjusted average hourly rate: ${adjusted_hourly_rate:.2f}")
     st.write(f"Total employee cost with adjustments: ${adjusted_employee_cost:.2f}")
     st.write(f"Event Cancellation Fee: ${cancellation_fee:.2f}")
     st.write(f"Total Cancellation Charge (employee + event): ${total_cancellation_charge:.2f}")
-    st.write(f"Average Hourly Rate: ${hourly_rate_used:.2f}")
