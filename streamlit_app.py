@@ -17,6 +17,7 @@ def calculate_event_costs(num_customers, total_event_cost, cancellation_percenta
     if not isinstance(cancellation_percentage, (int, float)) or not 0 <= cancellation_percentage <= 100:
         return "Error: Cancellation percentage must be between 0 and 100."
 
+    # Auto-calculate the number of employees needed
     if 10 <= num_customers < 20:
         num_employees = 2
     elif 20 <= num_customers < 25:
@@ -60,10 +61,26 @@ if st.button("Calculate"):
     # Display results
     if isinstance(result, dict):
         st.subheader("Calculation Results:")
-        st.write(f"Number of employees needed: {result['num_employees']}")
-        st.write(f"Total employee cost: ${result['employee_cost']:.2f}")
-        st.write(f"Event Cancellation Fee: ${result['cancellation_fee']:.2f}")
-        st.write(f"Total Cancellation Charge (employee + event): ${result['total_cancellation_charge']:.2f}")
-        st.write(f"Average Hourly Rate: ${result['average_hourly_rate']:.2f}")
+        st.write(f"Auto-calculated number of employees needed: {result['num_employees']}")
+        
+        # Allow user to adjust the number of employees
+        adjusted_employees = st.number_input("Adjust Number of Employees", 
+                                              value=result['num_employees'], 
+                                              min_value=1, 
+                                              step=1)
+
+        # Recalculate costs based on adjusted number of employees
+        hourly_rate_used = (16 + 30) / 2  # Average hourly rate
+        adjusted_employee_cost = adjusted_employees * hourly_rate_used * 8  # Assuming 8 hours per event
+        cancellation_fee = (total_event_cost * cancellation_percentage) / 100
+        total_cost = total_event_cost + adjusted_employee_cost
+        total_cancellation_charge = cancellation_fee + adjusted_employee_cost
+
+        # Display adjusted results
+        st.write(f"Adjusted number of employees: {adjusted_employees}")
+        st.write(f"Total employee cost with adjustments: ${adjusted_employee_cost:.2f}")
+        st.write(f"Event Cancellation Fee: ${cancellation_fee:.2f}")
+        st.write(f"Total Cancellation Charge (employee + event): ${total_cancellation_charge:.2f}")
+        st.write(f"Average Hourly Rate: ${hourly_rate_used:.2f}")
     else:
         st.error(result)  # Display error message if any
