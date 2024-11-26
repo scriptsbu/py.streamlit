@@ -5,25 +5,18 @@ def load_csv(uploaded_file):
     """Load a CSV file into a DataFrame."""
     return pd.read_csv(uploaded_file)
 
-def compare_access(export_df, employees_df, identifier_col):
-    """Compare access from the export against current employees using the identifier."""
+def compare_access(export_df, employees_df):
+    """Compare users from the export against current employees."""
     # Normalize column names for comparison
     export_df.columns = export_df.columns.str.strip().str.lower()
     employees_df.columns = employees_df.columns.str.strip().str.lower()
-    
-    # Ensure the identifier column exists
-    if identifier_col not in export_df.columns:
-        st.error(f"Identifier column '{identifier_col}' not found in the export file.")
-        return None
 
-    # Get the users from the export file
-    export_users = set(export_df[identifier_col].str.strip().str.lower())
-    
-    # Get the valid employees from the current employees list
-    valid_employees = set(employees_df['username'].str.strip().str.lower())  # Assuming 'username' as identifier in employees
+    # Extract relevant columns
+    export_users = set(zip(export_df['username'], export_df['email']))
+    valid_employees = set(zip(employees_df['username'], employees_df['email']))
 
     # Identify users who are in the export but not in the employee list
-    invalid_users = export_users.difference(valid_employees)
+    invalid_users = [user for user in export_users if user not in valid_employees]
 
     return invalid_users
 
@@ -43,17 +36,17 @@ def main():
         st.subheader("Export File Column Names:")
         st.write(export_df.columns.tolist())
         
-        # Allow the user to specify which column to use as an identifier (e.g., email)
-        identifier_col = st.text_input("Enter the column name for user identification (e.g., email):", value="email").strip().lower()
-
         if st.button("Execute Audit"):
             # Compare access
-            invalid_users = compare_access(export_df, employees_df, identifier_col)
+            invalid_users = compare_access(export_df, employees_df)
             
-            if invalid_users is not None:
+            if invalid_users:
                 # Display results
                 st.subheader("Users with Invalid Access:")
-                st.write(", ".join(invalid_users) if invalid_users else "All users are valid.")
+                for username, email in invalid_users:
+                    st.write(f"Username: {username}, Email: {email}")
+            else:
+                st.subheader("All users are valid.")
 
 if __name__ == "__main__":
     main()
