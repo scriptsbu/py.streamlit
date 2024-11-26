@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import io
 
 def load_csv(uploaded_file):
     """Load a CSV file into a DataFrame."""
@@ -12,11 +13,11 @@ def compare_access(export_df, employees_df):
     employees_df.columns = employees_df.columns.str.strip().str.lower()
 
     # Extract relevant columns
-    export_users = set(zip(export_df['username'], export_df['email']))
+    export_users = export_df[['username', 'email', 'license']]
     valid_employees = set(zip(employees_df['username'], employees_df['email']))
 
     # Identify users who are in the export but not in the employee list
-    invalid_users = [user for user in export_users if user not in valid_employees]
+    invalid_users = export_users[~export_users.apply(lambda row: (row['username'], row['email']) in valid_employees, axis=1)]
 
     return invalid_users
 
@@ -24,7 +25,7 @@ def main():
     st.title("Software License and Access Audit")
 
     # Upload files
-    export_file = st.file_uploader("Upload Software Export CSV (Adobe or Avigilon)", type='csv')
+    export_file = st.file_uploader("Upload Software Export CSV (i.e Adobe, Avigilon, MS 365)", type='csv')
     employees_file = st.file_uploader("Upload Current Employees CSV", type='csv')
 
     if export_file and employees_file:
@@ -40,11 +41,19 @@ def main():
             # Compare access
             invalid_users = compare_access(export_df, employees_df)
             
-            if invalid_users:
+            if not invalid_users.empty:
                 # Display results
                 st.subheader("Users with Invalid Access:")
-                for username, email in invalid_users:
-                    st.write(f"Username: {username}, Email: {email}")
+                st.write(invalid_users)
+
+                # Create CSV export of invalid users
+                csv = invalid_users.to_csv(index=False).encode('utf-8')
+                st.download_button(
+                    label="Download Invalid Users as CSV",
+                    data=csv,
+                    file_name='invalid_users.csv',
+                    mime='text/csv'
+                )
             else:
                 st.subheader("All users are valid.")
 
