@@ -23,3 +23,15 @@ if uploaded_file is not None:
     if base64_string:
         st.success("Image converted to Base64 successfully!")
         st.text_area("Base64 String:", base64_string, height=300)
+        
+        # Button to copy the Base64 string to clipboard
+        if st.button("Copy to Clipboard"):
+            # Use Streamlit's built-in method to copy text
+            st.text("Base64 string copied to clipboard!")
+            # JavaScript to copy to clipboard
+            js = f"""
+            <script>
+            navigator.clipboard.writeText(`{base64_string}`);
+            </script>
+            """
+            st.markdown(js, unsafe_allow_html=True)
