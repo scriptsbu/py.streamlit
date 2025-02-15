@@ -48,7 +48,7 @@ if uploaded_file is not None:
 
     if resized_image:
         # Display the resized image
-        st.image(resized_image, caption="Resized Image", use_column_width=True)
+        st.image(resized_image, caption="Resized Image", use_container_width=True)
 
         # Provide a download link for the resized image
         img_buffer = io.BytesIO()
