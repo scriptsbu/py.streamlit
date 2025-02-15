@@ -17,7 +17,7 @@ def convert_image_to_base64(image_file):
 st.title("PNG to Base64 Converter")
 
 # File uploader with a specific size limit
-uploaded_file = st.file_uploader("Choose a PNG file (max size: 5 MB)", type=["png"])
+uploaded_file = st.file_uploader("Choose a PNG file (max size: 500 KB)", type=["png"])
 
 if uploaded_file is not None:
     # Check file size
