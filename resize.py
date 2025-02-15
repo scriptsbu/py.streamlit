@@ -3,27 +3,33 @@ from PIL import Image
 import io
 
 def resize_image(image, target_size_kb):
-    """Resize the image to be under the target size in KB."""
+    """Resize the image dimensions and quality to be under the target size in KB."""
+    # Initial image size check
     img_stream = io.BytesIO()
-    quality = 95  # Start quality a bit lower to avoid too much iteration
-    while True:
-        # Save the image to the BytesIO stream
+    image.save(img_stream, format='PNG')
+    size_kb = img_stream.tell() / 1024  # Initial size in KB
+
+    # Resize if initial size is larger than target
+    if size_kb > target_size_kb:
+        # Reduce dimensions
+        width, height = image.size
+        ratio = (target_size_kb / size_kb) ** 0.5
+        new_size = (int(width * ratio), int(height * ratio))
+        image = image.resize(new_size, Image.ANTIALIAS)
+
+    # Adjust quality to fit the size requirement
+    quality = 95
+    while quality > 10:
+        img_stream = io.BytesIO()
         image.save(img_stream, format='PNG', quality=quality)
         img_stream.seek(0)
         
-        # Check the size of the image
-        size_kb = img_stream.tell() / 1024  # Convert bytes to KB
-        
-        if size_kb <= target_size_kb or quality <= 10:
+        size_kb = img_stream.tell() / 1024  # Check the size again
+
+        if size_kb <= target_size_kb:
             break
-            
-        quality -= 5  # Decrease quality to reduce size
-        
-        # Prevent infinite loop by checking if quality is too low
-        if quality <= 0:
-            st.error("Unable to compress image below 500 KB. Try a smaller image.")
-            return None
-    
+        quality -= 5  # Decrease quality
+
     img_stream.seek(0)
     return Image.open(img_stream)
 
