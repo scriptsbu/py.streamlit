@@ -14,10 +14,24 @@ def convert_image_to_base64(image_file):
     return None
 
 # Function to resize image
-def resize_image(image, max_size=(500, 500)):
-    image.thumbnail(max_size, Image.ANTIALIAS)
+def resize_image(image, target_size_kb=500):
+    """Resize the image to be less than target_size_kb."""
+    target_size = target_size_kb * 1024  # Convert KB to bytes
+    quality = 95  # Start with high quality
     buffer = io.BytesIO()
-    image.save(buffer, format="PNG")
+
+    while True:
+        # Save image to buffer
+        buffer.seek(0)
+        image.save(buffer, format="PNG", quality=quality)
+        if buffer.tell() <= target_size:
+            break
+        quality -= 5  # Reduce quality to decrease file size
+        if quality < 10:  # Ensure quality doesn't go too low
+            st.warning("Could not resize the image below the target size.")
+            break
+
+    buffer.seek(0)  # Reset buffer position
     return buffer
 
 # Streamlit app
