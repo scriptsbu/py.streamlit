@@ -1,5 +1,7 @@
 import streamlit as st
 import base64
+from PIL import Image
+import io
 
 # Function to convert image to Base64
 def convert_image_to_base64(image_file):
@@ -11,18 +13,34 @@ def convert_image_to_base64(image_file):
         return base64_string
     return None
 
+# Function to resize image
+def resize_image(image, max_size=(500, 500)):
+    image.thumbnail(max_size, Image.ANTIALIAS)
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+    return buffer
+
 # Streamlit app
-st.title("PNG to Base64 Mangui-Converter")
+st.title("PNG to Base64 Converter")
 
 # File uploader with a specific size limit
-uploaded_file = st.file_uploader("Choose a PNG file (max size: 500 KB)", type=["png"])
+uploaded_file = st.file_uploader("Choose a PNG file (max size: 5 MB)", type=["png"])
 
 if uploaded_file is not None:
     # Check file size
-    if uploaded_file.size > 500 * 1024:  # 500 KB in bytes
-        st.error("File size exceeds 500 KB. Please upload a smaller file.")
+    if uploaded_file.size > 5 * 1024 * 1024:  # 5 MB in bytes
+        st.error("File size exceeds 5 MB. Please upload a smaller file.")
     else:
-        base64_string = convert_image_to_base64(uploaded_file)
+        # Convert file to image
+        image = Image.open(uploaded_file)
+        
+        # Resize if necessary
+        if uploaded_file.size > 500 * 1024:  # 500 KB in bytes
+            st.warning("File size exceeds 500 KB. Resizing the image...")
+            resized_image_buffer = resize_image(image)
+            base64_string = convert_image_to_base64(resized_image_buffer)
+        else:
+            base64_string = convert_image_to_base64(uploaded_file)
 
         if base64_string:
             st.success("Image converted to Base64 successfully!")
