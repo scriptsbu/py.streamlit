@@ -9,13 +9,16 @@ def resize_image(image, target_size_kb):
     image.save(img_stream, format='PNG')
     size_kb = img_stream.tell() / 1024  # Initial size in KB
 
-    # Resize if initial size is larger than target
+    # If the image is larger than the target size, resize it
     if size_kb > target_size_kb:
-        # Reduce dimensions
-        width, height = image.size
-        ratio = (target_size_kb / size_kb) ** 0.5
-        new_size = (int(width * ratio), int(height * ratio))
-        image = image.resize(new_size, Image.ANTIALIAS)
+        # Reduce dimensions to half repeatedly until under size
+        while size_kb > target_size_kb:
+            width, height = image.size
+            new_size = (width // 2, height // 2)
+            image = image.resize(new_size, Image.ANTIALIAS)
+            img_stream = io.BytesIO()
+            image.save(img_stream, format='PNG')
+            size_kb = img_stream.tell() / 1024  # Check new size
 
     # Adjust quality to fit the size requirement
     quality = 95
