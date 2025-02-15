@@ -4,19 +4,20 @@ import io
 
 def resize_image(image, target_size_kb):
     """Resize the image to be under the target size in KB."""
-    # Initial image size check
     img_stream = io.BytesIO()
     image.save(img_stream, format='PNG')
     size_kb = img_stream.tell() / 1024  # Initial size in KB
 
-    # Resize if initial size is larger than target
-    if size_kb > target_size_kb:
-        # Resize image proportionally
+    # If the image is larger than the target size, resize it
+    while size_kb > target_size_kb:
+        # Reduce dimensions by half
         width, height = image.size
-        scaling_factor = (target_size_kb / size_kb) ** 0.5
-        new_width = int(width * scaling_factor)
-        new_height = int(height * scaling_factor)
-        image = image.resize((new_width, new_height), Image.ANTIALIAS)
+        new_size = (width // 2, height // 2)
+        image = image.resize(new_size, Image.ANTIALIAS)
+
+        img_stream = io.BytesIO()
+        image.save(img_stream, format='PNG')
+        size_kb = img_stream.tell() / 1024  # Check new size
 
     # Adjust quality to fit the size requirement
     quality = 95
@@ -28,7 +29,7 @@ def resize_image(image, target_size_kb):
         if size_kb <= target_size_kb:
             img_stream.seek(0)
             return Image.open(img_stream)
-        
+
         quality -= 5  # Decrease quality
 
     st.error("Unable to compress image below 500 KB. Try a smaller image.")
