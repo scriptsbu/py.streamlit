@@ -14,7 +14,7 @@ def convert_image_to_base64(image_file):
     return None
 
 # Streamlit app
-st.title("PNG to Base64 Converter")
+st.title("PNG to Base64 Mangui-Converter")
 
 # File uploader with a specific size limit
 uploaded_file = st.file_uploader("Choose a PNG file (max size: 500 KB)", type=["png"])
