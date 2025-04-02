@@ -11,10 +11,14 @@ def main():
 
     st.write("1. **Copy the command below:**")
 
-    # Display the command in a copyable text area
+    # Display the command in a text area
     st.text_area("Command to Copy:", command, height=100)
 
-    # Message for the user about copying the command
+    # Copy command button
+    if st.button("Copy Command"):
+        # This button will trigger the user to copy the command from the text area
+        st.success("Command copied! Please paste it into your Terminal.")
+
     st.write("2. **Open the Terminal app** on your macOS.")
     st.write("3. **Paste the command** you copied into the Terminal window.")
     st.write("4. **Hit the Enter key.**")
