@@ -15,8 +15,8 @@ def main():
     st.code(command, language="bash")
 
     # Copy command button (informational)
-    if st.button("Click to Copy Command"):
-        st.success("Please select the command above to copy it to your clipboard.")
+    #if st.button("Click to Copy Command"):
+    #    st.success("Please select the command above to copy it to your clipboard.")
 
     st.write("2. **Open the Terminal app** on your macOS.")
     st.write("3. **Paste the command** you copied into the Terminal window.")
