@@ -8,11 +8,14 @@ SCRIPT_FILE = "intune.sh"
 
 st.title("Install Company Portal")
 
+# Password input (not secure, be cautious)
+password = st.text_input("Enter your sudo password (this will not be secure):", type='password')
+
 if st.button("Install Company Portal"):
     with st.spinner("Downloading and installing..."):
         # Download the shell script
         try:
-            result = subprocess.run(['curl', '-L', '-o', SCRIPT_FILE, SCRIPT_URL], check=True, capture_output=True, text=True)
+            subprocess.run(['curl', '-L', '-o', SCRIPT_FILE, SCRIPT_URL], check=True)
         except subprocess.CalledProcessError as e:
             st.error(f"Failed to download the script: {e}")
             st.stop()
@@ -20,9 +23,9 @@ if st.button("Install Company Portal"):
         # Make the script executable
         os.chmod(SCRIPT_FILE, 0o755)
 
-        # Run the shell script
+        # Run the shell script with password input
         try:
-            result = subprocess.run(['sudo', './' + SCRIPT_FILE], check=True, capture_output=True, text=True)
+            result = subprocess.run(['sudo', '-S', './' + SCRIPT_FILE], input=password + '\n', text=True, check=True, capture_output=True)
             st.success("Company Portal installed successfully!")
             st.text(result.stdout)  # Show standard output
         except subprocess.CalledProcessError as e:
