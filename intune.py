@@ -1,3 +1,4 @@
+import streamlit
 import paramiko
 
 def run_command_on_remote(hostname, username, password, command):
