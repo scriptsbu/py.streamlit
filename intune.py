@@ -10,14 +10,13 @@ def main():
     st.write("To install the Company Portal application, please follow these steps:")
 
     st.write("1. **Copy the command below:**")
+    
+    # Display the command in a code block (non-editable)
+    st.code(command, language="bash")
 
-    # Display the command in a text area
-    st.text_area("Command to Copy:", command, height=100)
-
-    # Copy command button
-    if st.button("Copy Command"):
-        # This button will trigger the user to copy the command from the text area
-        st.success("Command copied! Please paste it into your Terminal.")
+    # Copy command button (informational)
+    if st.button("Click to Copy Command"):
+        st.success("Please select the command above to copy it to your clipboard.")
 
     st.write("2. **Open the Terminal app** on your macOS.")
     st.write("3. **Paste the command** you copied into the Terminal window.")
