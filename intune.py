@@ -22,11 +22,13 @@ if st.button("Install Company Portal"):
 
         # Run the shell script
         try:
-            subprocess.run(['sudo', './' + SCRIPT_FILE], check=True)
+            result = subprocess.run(['sudo', './' + SCRIPT_FILE], check=True, capture_output=True, text=True)
             st.success("Company Portal installed successfully!")
+            st.text(result.stdout)  # Show standard output
         except subprocess.CalledProcessError as e:
             st.error(f"Error during installation: {e}")
-            st.stop()
+            st.text(e.stdout)  # Show standard output
+            st.text(e.stderr)  # Show standard error
         
         # Clean up by removing the script after execution
         os.remove(SCRIPT_FILE)
