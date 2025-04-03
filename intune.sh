@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# Author: Alberto Lopez-Santiago
+# Description: This script downloads the Company Portal installer package,
+# installs the application on a macOS system, and opens the application
+# once the installation is complete.
+
+# Display introduction
+echo "============================================"
+echo "          Company Portal Installer          "
+echo "            Author: Alberto Lopez-Santiago  "
+echo "            Description: Downloading and     "
+echo "            installing the Company Portal    "
+echo "            application for macOS.           "
+echo "============================================"
 # Define the URL and the destination file
 URL="https://go.microsoft.com/fwlink/?linkid=853070"
 PKG_FILE="CompanyPortal-Installer.pkg"
